@@ -1,9 +1,9 @@
 package timedlist_test
 
 import (
+	timedlist "github.com/28Pollux28/TimedList"
 	"testing"
 	"time"
-	"timedlist"
 )
 
 //nolint:funlen

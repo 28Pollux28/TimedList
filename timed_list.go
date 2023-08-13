@@ -107,7 +107,7 @@ func (t *TimedList) Add(v interface{}, d time.Duration) (item *TimedEntry) {
 	item = &TimedEntry{v, time.Now().Add(d)}
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if t.t == nil {
+	if t.t == nil || t.entries.Len() == 0 {
 		t.t = time.NewTimer(d)
 		t.entries.InsertNoReplace(item)
 		t.ctx, t.cancel = context.WithCancel(context.Background())

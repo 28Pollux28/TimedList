@@ -1,4 +1,4 @@
-module timedlist
+module github.com/28Pollux28/TimedList
 
 go 1.20
 
