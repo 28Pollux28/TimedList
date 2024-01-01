@@ -79,7 +79,9 @@ func (t *TimedList) run() {
 			t.mu.Lock()
 			min := t.entries.DeleteMin()
 			t.mu.Unlock()
-			go func() { t.C <- min.(*TimedEntry).v }()
+			if min != nil {
+				go func() { t.C <- min.(*TimedEntry).v }()
+			}
 			if t.entries.Len() == 0 {
 				t.t = nil
 				return
@@ -92,10 +94,10 @@ func (t *TimedList) run() {
 // stop stops the TimedList
 func (t *TimedList) stop() {
 	if t.t != nil {
+		t.cancel()
 		if !t.t.Stop() {
 			<-t.t.C
 		}
-		t.cancel()
 		t.t = nil
 	}
 }
@@ -130,7 +132,11 @@ func (t *TimedList) Add(v interface{}, d time.Duration) (item *TimedEntry) {
 func (t *TimedList) Remove(te *TimedEntry) (v interface{}) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	entry := t.entries.Delete(te).(*TimedEntry)
+	item := t.entries.Delete(te)
+	if item == nil {
+		return nil
+	}
+	entry := item.(*TimedEntry)
 	v = entry.v
 	if t.entries.Len() == 0 {
 		t.stop()
